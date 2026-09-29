@@ -6,7 +6,6 @@ lifts = [
 
 ]
 
-
 # Functions
 
 def help_Function():
@@ -14,11 +13,8 @@ def help_Function():
     for command in commands:
         print(f"- {command}: {commands[command][1]}")
 
-def exit_Function():
-    # Exits the program
-    return
-
 def add_Lift_Function():
+
     lift_To_Add = str.lower(input("Enter the name of the lift to add: "))
     lifts.append({lift_To_Add: {}})
     print("List of Lifts:")
@@ -29,8 +25,6 @@ def add_Lift_Function():
 
 def remove_Lift_Function():
     lift_To_Remove = str.lower(input("Enter the name of the lift to remove: "))
-
-
 
     for lift in lifts:
         if lift_To_Remove in lift:
@@ -52,7 +46,6 @@ def list_lifts_Function():\
     for lift in lifts:
         print(f"- {lift}")
 
-
 # Edit functions
 
 def edit_Lift_Logic(lift: dict):
@@ -66,27 +59,17 @@ def edit_Lift_Logic(lift: dict):
             for command in edit_Commands:
                 print(f"- {command}: {edit_Commands[command][1]}")
             continue
-            
-            
-
-        if edit_Input in edit_Commands:
-            if edit_Input == "add":
-                edit_Commands[edit_Input][0](lift)
-            elif edit_Input == "exit":
-                print("Exiting edit process...")
-                return
-            else:
-                edit_Commands[edit_Input][0]() 
-        else:
+        
+        if edit_Input not in edit_Commands:
             print("Unknown command. Enter 'edit help' for a list of helpful commands")
             continue
 
-        
-
+        if edit_Input == "exit": 
+            print("Exiting edit process...")
+            return
+        else:
+            edit_Commands[edit_Input][0](lift)           
     
-    
-    
-
 def edit_Lift_Function():
     lift_Input = str.lower(input("Enter the name of the lift to edit: "))
     for lift in lifts:
@@ -108,7 +91,6 @@ def edit_Add_Function(lift: dict):
             "float": "A number with decimals",
         }
 
-        
         print(f"-- Currently Editing: {lift}")
 
         choice_Input = str.lower(input("What are you adding?: "))
@@ -147,14 +129,44 @@ def edit_Add_Function(lift: dict):
         else:
             continue
 
-
     return
 
-def edit_Remove_Function():
-    print("edit remove")
+def edit_Remove_Function(lift: dict):
+    lift_Name = next(iter(lift))
+    removing = True
+    print("--Enter 'list' to see your lift and what you can remove")
+    def list():
+        print(f"Currently editing: {lift_Name}")
+        
+        if len(lift.items()) == 0:
+            print("Lift has no children (additions/edits), try again")
+            return
+        for key in lift[lift_Name]:
+            print(f"- {key}")
+
+    while removing:
+        remove_Input = input("What would you like to remove? (type 'list' for a list of what to remove): ")
+
+        if remove_Input == "list":
+            list()
+            continue
+        if remove_Input == "exit":
+            print("Exiting edit removal process...")
+            return
+
+        if remove_Input not in lift[lift_Name]:
+            if str.lower(input("Item not found, would you like to try again?")) == "yes":
+                continue
+            else:
+                return
+            
+        if str.lower(input("Are you sure?: ")) == "yes":
+            del lift[lift_Name][remove_Input]
+            print("Deletion successful. Type 'edit help' to see a list of commands.")
+            return
     return
 
-def edit_Edit_Function():
+def edit_Edit_Function(lift):
     print("Edit")
     return
 
@@ -162,7 +174,7 @@ def edit_Edit_Function():
 # Commands
 commands = {
     "help": [help_Function, "This displays the list of available commands"],
-    "exit": [exit_Function, "Exits the application"],
+    "exit": [(), "Exits the application"],
     "add lift": [add_Lift_Function, "This adds a new lift to the list"],
     "remove lift": [remove_Lift_Function, "This removes a lift from the list"],
     "list lifts": [list_lifts_Function, "This displays the list of lifts"],
